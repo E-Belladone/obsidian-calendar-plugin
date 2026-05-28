@@ -30,10 +30,7 @@ export async function getBulletColors(note: TFile): Promise<string[]> {
   const colors: string[] = [];
   for (const line of lines) {
     if (!line.startsWith("- ") || isTaskLine(line)) continue;
-    const color = colorForLine(line, BULLET_PREFIX_COLORS);
-    if (color !== null) {
-      colors.push(color);
-    }
+    colors.push(colorForLine(line, BULLET_PREFIX_COLORS));
   }
   return colors;
 }

@@ -24,10 +24,7 @@ export async function getTaskColors(note: TFile): Promise<string[]> {
   const colors: string[] = [];
   for (const line of lines) {
     if (!isTaskLine(line)) continue;
-    const color = colorForLine(line, TASK_PREFIX_COLORS);
-    if (color !== null) {
-      colors.push(color);
-    }
+    colors.push(colorForLine(line, TASK_PREFIX_COLORS));
   }
   return colors;
 }

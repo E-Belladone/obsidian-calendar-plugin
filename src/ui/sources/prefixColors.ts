@@ -2,7 +2,9 @@
 // character of a task or bullet line. Both task-prefix (- [ ] X ...) and
 // plain-bullet-prefix (- X ...) reuse the same colors; each source file
 // builds its own prefix -> color lookup with the appropriate leading token.
-// Lines without a recognised prefix do not emit a dot.
+// Lines without a recognised prefix fall back to DEFAULT_COLOR (muted grey).
+
+export const DEFAULT_COLOR = "#6e6a86";
 
 export const ROSE_PINE: Record<string, string> = {
   "!": "#eb6f92",
@@ -26,13 +28,13 @@ export function buildPrefixTable(leadingToken: string): Record<string, string> {
 export function colorForLine(
   line: string,
   table: Record<string, string>
-): string | null {
+): string {
   for (const prefix of Object.keys(table)) {
     if (line.startsWith(prefix)) {
       return table[prefix];
     }
   }
-  return null;
+  return DEFAULT_COLOR;
 }
 
 export function stripFrontmatter(content: string): string {
