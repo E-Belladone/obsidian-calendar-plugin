@@ -5,15 +5,30 @@ import { getDailyNote, getWeeklyNote } from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
 import { dailyNotes, weeklyNotes } from "../stores";
+import {
+  buildPrefixTable,
+  colorForLine,
+  isTaskLine,
+  stripFrontmatter,
+} from "./prefixColors";
 
-export async function getNumberOfRemainingTasks(note: TFile): Promise<number> {
+const NUM_MAX_DOTS = 6;
+const TASK_PREFIX_COLORS = buildPrefixTable("- [ ] ");
+
+export async function getTaskColors(note: TFile): Promise<string[]> {
   if (!note) {
-    return 0;
+    return [];
   }
-
   const { vault } = window.app;
   const fileContents = await vault.cachedRead(note);
-  return (fileContents.match(/(-|\*) \[ \]/g) || []).length;
+  const lines = stripFrontmatter(fileContents).split("\n");
+  const colors: string[] = [];
+  for (const line of lines) {
+    if (isTaskLine(line)) {
+      colors.push(colorForLine(line, TASK_PREFIX_COLORS));
+    }
+  }
+  return colors;
 }
 
 export async function getDotsForDailyNote(
@@ -22,15 +37,14 @@ export async function getDotsForDailyNote(
   if (!dailyNote) {
     return [];
   }
-  const numTasks = await getNumberOfRemainingTasks(dailyNote);
-
-  const dots = [];
-  if (numTasks) {
-    dots.push({
-      className: "task",
-      color: "default",
-      isFilled: false,
-    });
+  const colors = await getTaskColors(dailyNote);
+  const seen = new Set<string>();
+  const dots: IDot[] = [];
+  for (const color of colors) {
+    if (dots.length >= NUM_MAX_DOTS) break;
+    if (seen.has(color)) continue;
+    seen.add(color);
+    dots.push({ className: "task", color, isFilled: false });
   }
   return dots;
 }
