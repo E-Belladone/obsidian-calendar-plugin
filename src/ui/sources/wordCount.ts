@@ -8,6 +8,7 @@ import { dailyNotes, weeklyNotes } from "../stores";
 import {
   buildPrefixTable,
   colorForLine,
+  dedupColors,
   isTaskLine,
   stripFrontmatter,
 } from "./prefixColors";
@@ -41,7 +42,7 @@ export async function getDotsForDailyNote(
   if (!dailyNote) {
     return [];
   }
-  const colors = await getBulletColors(dailyNote);
+  const colors = dedupColors(await getBulletColors(dailyNote));
   return colors.map((color) => ({
     color,
     isFilled: true,

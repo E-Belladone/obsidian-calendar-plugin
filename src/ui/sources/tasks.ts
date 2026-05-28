@@ -8,7 +8,8 @@ import { dailyNotes, weeklyNotes } from "../stores";
 import {
   buildPrefixTable,
   colorForLine,
-  isTaskLine,
+  dedupColors,
+  isOpenTask,
   stripFrontmatter,
 } from "./prefixColors";
 
@@ -23,7 +24,7 @@ export async function getTaskColors(note: TFile): Promise<string[]> {
   const lines = stripFrontmatter(fileContents).split("\n");
   const colors: string[] = [];
   for (const line of lines) {
-    if (!isTaskLine(line)) continue;
+    if (!isOpenTask(line)) continue;
     colors.push(colorForLine(line, TASK_PREFIX_COLORS));
   }
   return colors;
@@ -35,7 +36,7 @@ export async function getDotsForDailyNote(
   if (!dailyNote) {
     return [];
   }
-  const colors = await getTaskColors(dailyNote);
+  const colors = dedupColors(await getTaskColors(dailyNote));
   return colors.map((color) => ({
     className: "task",
     color,

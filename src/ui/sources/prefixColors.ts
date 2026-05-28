@@ -49,3 +49,20 @@ export function isTaskLine(line: string): boolean {
     line.startsWith("- [>]")
   );
 }
+
+// Only unchecked tasks contribute hollow circles; checked or deferred
+// states do not.
+export function isOpenTask(line: string): boolean {
+  return line.startsWith("- [ ]");
+}
+
+export function dedupColors(colors: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const c of colors) {
+    if (seen.has(c)) continue;
+    seen.add(c);
+    out.push(c);
+  }
+  return out;
+}
