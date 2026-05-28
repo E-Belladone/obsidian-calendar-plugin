@@ -1,5 +1,7 @@
 # obsidian-calendar-plugin
 
+> **Fork notice.** This is a fork of [liamcain/obsidian-calendar-plugin](https://github.com/liamcain/obsidian-calendar-plugin). It changes the dot semantics to be prefix-driven (each character after the bullet picks a Rose Pine color), restricts hollow circles to unchecked tasks only, and points the calendar at a separate "event notes" folder instead of the daily journal folder. See [Fork behavior](#fork-behavior) for details. The upstream documentation below still applies for everything not listed there.
+
 This plugin for [Obsidian](https://obsidian.md/) creates a simple Calendar view for visualizing and navigating between your daily notes.
 
 ![screenshot-full](https://raw.githubusercontent.com/liamcain/obsidian-calendar-plugin/master/images/screenshot-full.png)
@@ -16,6 +18,59 @@ The plugin reads your Daily Note settings to know your date format, your daily n
 - Create new daily notes for days that don't have one. (This is helpful for when you need to backfill old notes or if you're planning ahead for future notes! This will use your current **daily note** template!)
 - Visualize your writing. Each day includes a meter to approximate how much you've written that day.
 - Use **Weekly notes** for an added organization layer! They work just like daily notes, but have their own customization options.
+
+## Fork behavior
+
+This fork diverges from upstream in three places.
+
+### Source: event notes, not daily notes
+
+Daily journals (where you reflect on the day) and event notes (where tasks and events are planned ahead) are decoupled. The calendar reads event notes only, so a day "lights up" the moment something is planned for it, not when the journal entry is created.
+
+The defaults baked into the build:
+
+- Folder:   `Z0_Periodic_Notes/Z03_Calendar/Z031_Daily_Events`
+- Format:   `YYYY-MM-DD_[Events]`
+- Template: `Z2_Meta/Templates/daily_events_template.md`
+
+These are applied via a `patch-package` patch to `obsidian-daily-notes-interface` (see `patches/obsidian-daily-notes-interface+0.9.0.patch`). Adopters can edit the patch and rerun `npm install` to point at a different folder.
+
+### Dots: filled = events, hollow = open tasks
+
+Upstream renders one filled dot per N words and one hollow dot per day with incomplete tasks. This fork makes both kinds line-driven and prefix-colored:
+
+- One **filled dot** per unique color appearing on non-task bullets (`- X ...`).
+- One **hollow circle** per unique color appearing on unchecked tasks (`- [ ] X ...`). Checked / cancelled / deferred states (`[x] / [-] / [>]`) do not contribute.
+- Same color on multiple lines collapses to a single mark.
+
+Dot rendering is bumped from 6x6 to 10x10 so the colors actually read; the `color` prop is wired through `obsidian-calendar-ui` (see `patches/obsidian-calendar-ui+0.3.12.patch`).
+
+### Prefix palette (Rose Pine)
+
+The single character right after the bullet (or checkbox) selects the color:
+
+| Prefix  | Color  | Hex       |
+| ------- | ------ | --------- |
+| `!`     | Red    | `#eb6f92` |
+| `&`     | Gold   | `#f6c177` |
+| `$`     | Teal   | `#31748f` |
+| `~`     | Purple | `#c4a7e7` |
+| `@`     | Cyan   | `#9ccfd8` |
+| `%`     | Lilac  | `#e0def4` |
+| `?`     | Pink   | `#ebbcba` |
+| `^`     | Dark   | `#21202e` |
+| *(none)*| Muted  | `#6e6a86` |
+
+To change the palette or add prefixes, edit `ROSE_PINE` in `src/ui/sources/prefixColors.ts` and rebuild.
+
+### Building
+
+```sh
+npm install   # installs deps and applies patches via postinstall
+npm run build # produces main.js
+```
+
+Copy `main.js` and `manifest.json` into your vault's `.obsidian/plugins/calendar/` to install.
 
 ## Settings
 
@@ -75,6 +130,8 @@ You can install the plugin via the Community Plugins tab within Obsidian. Just s
 ## FAQ
 
 ### What do the dots mean?
+
+> In this fork the rules are different. See [Fork behavior](#fork-behavior). The upstream description below applies to the original plugin.
 
 Each solid dot represents 250 words in your daily note. So 4 dots means you've written a thousands words for that day! If you want to change that threshold, you can set a different value for "Words Per Dot" in the Calendar settings.
 
