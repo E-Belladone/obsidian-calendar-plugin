@@ -4,23 +4,36 @@ import type { ICalendarSource, IDayMetadata, IDot } from "obsidian-calendar-ui";
 import { getDailyNote, getWeeklyNote } from "obsidian-daily-notes-interface";
 import { get } from "svelte/store";
 
-import { DEFAULT_WORDS_PER_DOT } from "src/constants";
+import { dailyNotes, weeklyNotes } from "../stores";
+import {
+  buildPrefixTable,
+  colorForLine,
+  dedupColors,
+  isTaskLine,
+  stripFrontmatter,
+} from "./prefixColors";
 
-import { dailyNotes, settings, weeklyNotes } from "../stores";
-import { clamp, getWordCount } from "../utils";
+// In the upstream plugin this file produced one filled dot per N words of
+// the note. The local fork replaces that with prefix-driven coloring: each
+// non-task bullet whose first char after "- " is a Rose Pine code becomes
+// a filled dot of the matching color. Lines without a prefix do not emit
+// a dot. The wordCount filename and exports are preserved so the source
+// registry in view.ts stays untouched.
 
-const NUM_MAX_DOTS = 5;
+const BULLET_PREFIX_COLORS = buildPrefixTable("- ");
 
-export async function getWordLengthAsDots(note: TFile): Promise<number> {
-  const { wordsPerDot = DEFAULT_WORDS_PER_DOT } = get(settings);
-  if (!note || wordsPerDot <= 0) {
-    return 0;
+export async function getBulletColors(note: TFile): Promise<string[]> {
+  if (!note) {
+    return [];
   }
   const fileContents = await window.app.vault.cachedRead(note);
-
-  const wordCount = getWordCount(fileContents);
-  const numDots = wordCount / wordsPerDot;
-  return clamp(Math.floor(numDots), 1, NUM_MAX_DOTS);
+  const lines = stripFrontmatter(fileContents).split("\n");
+  const colors: string[] = [];
+  for (const line of lines) {
+    if (!line.startsWith("- ") || isTaskLine(line)) continue;
+    colors.push(colorForLine(line, BULLET_PREFIX_COLORS));
+  }
+  return colors;
 }
 
 export async function getDotsForDailyNote(
@@ -29,16 +42,11 @@ export async function getDotsForDailyNote(
   if (!dailyNote) {
     return [];
   }
-  const numSolidDots = await getWordLengthAsDots(dailyNote);
-
-  const dots = [];
-  for (let i = 0; i < numSolidDots; i++) {
-    dots.push({
-      color: "default",
-      isFilled: true,
-    });
-  }
-  return dots;
+  const colors = dedupColors(await getBulletColors(dailyNote));
+  return colors.map((color) => ({
+    color,
+    isFilled: true,
+  }));
 }
 
 export const wordCountSource: ICalendarSource = {
