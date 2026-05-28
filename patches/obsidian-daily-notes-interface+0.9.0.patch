@@ -1,0 +1,62 @@
+diff --git a/node_modules/obsidian-daily-notes-interface/dist/main.js b/node_modules/obsidian-daily-notes-interface/dist/main.js
+index 3e21e90..1130908 100755
+--- a/node_modules/obsidian-daily-notes-interface/dist/main.js
++++ b/node_modules/obsidian-daily-notes-interface/dist/main.js
+@@ -4,7 +4,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
+ 
+ var obsidian = require('obsidian');
+ 
+-const DEFAULT_DAILY_NOTE_FORMAT = "YYYY-MM-DD";
++// Bella fork: the calendar plugin operates on event notes
++// (Z0_Periodic_Notes/Z03_Calendar/Z031_Daily_Events/YYYY-MM-DD_Events.md)
++// rather than daily journal notes. Daily notes are created separately by
++// the daily template's Templater hook on the current day; event notes
++// are created when planning a task or event for any future date.
++// Decoupling the two means the calendar reflects what's planned, not
++// what's been journalled.
++const DEFAULT_DAILY_NOTE_FORMAT = "YYYY-MM-DD_[Events]";
++const DEFAULT_DAILY_NOTE_FOLDER = "Z0_Periodic_Notes/Z03_Calendar/Z031_Daily_Events";
++const DEFAULT_DAILY_NOTE_TEMPLATE = "Z2_Meta/Templates/daily_events_template.md";
+ const DEFAULT_WEEKLY_NOTE_FORMAT = "gggg-[W]ww";
+ const DEFAULT_MONTHLY_NOTE_FORMAT = "YYYY-MM";
+ 
+@@ -14,31 +23,16 @@ function shouldUsePeriodicNotesSettings(periodicity) {
+     return periodicNotes && periodicNotes.settings?.[periodicity]?.enabled;
+ }
+ /**
+- * Read the user settings for the `daily-notes` plugin
+- * to keep behavior of creating a new note in-sync.
++ * Bella fork: folder and template are forced to the event-note location
++ * regardless of what periodic-notes / daily-notes are configured to.
++ * Format keeps the "_Events" suffix so file lookup hits the right file.
+  */
+ function getDailyNoteSettings() {
+-    try {
+-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+-        const { internalPlugins, plugins } = window.app;
+-        if (shouldUsePeriodicNotesSettings("daily")) {
+-            const { format, folder, template } = plugins.getPlugin("periodic-notes")?.settings?.daily || {};
+-            return {
+-                format: format || DEFAULT_DAILY_NOTE_FORMAT,
+-                folder: folder?.trim() || "",
+-                template: template?.trim() || "",
+-            };
+-        }
+-        const { folder, format, template } = internalPlugins.getPluginById("daily-notes")?.instance?.options || {};
+-        return {
+-            format: format || DEFAULT_DAILY_NOTE_FORMAT,
+-            folder: folder?.trim() || "",
+-            template: template?.trim() || "",
+-        };
+-    }
+-    catch (err) {
+-        console.info("No custom daily note settings found!", err);
+-    }
++    return {
++        format: DEFAULT_DAILY_NOTE_FORMAT,
++        folder: DEFAULT_DAILY_NOTE_FOLDER,
++        template: DEFAULT_DAILY_NOTE_TEMPLATE,
++    };
+ }
+ /**
+  * Read the user settings for the `weekly-notes` plugin
