@@ -21,6 +21,8 @@ The plugin reads your Daily Note settings to know your date format, your daily n
 
 ## Fork behavior
 
+![screenshot-fork](./images/Screenshot-updated.png)
+
 This fork diverges from upstream in three places.
 
 ### Source: event notes, not daily notes
