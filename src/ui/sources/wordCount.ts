@@ -14,9 +14,10 @@ import {
 
 // In the upstream plugin this file produced one filled dot per N words of
 // the note. The local fork replaces that with prefix-driven coloring: each
-// non-task bullet whose first non-dash char is a Rose Pine code becomes a
-// filled dot of the matching color. The wordCount filename and exports are
-// preserved so the source registry in view.ts stays untouched.
+// non-task bullet whose first char after "- " is a Rose Pine code becomes
+// a filled dot of the matching color. Lines without a prefix do not emit
+// a dot. The wordCount filename and exports are preserved so the source
+// registry in view.ts stays untouched.
 
 const BULLET_PREFIX_COLORS = buildPrefixTable("- ");
 
@@ -28,8 +29,10 @@ export async function getBulletColors(note: TFile): Promise<string[]> {
   const lines = stripFrontmatter(fileContents).split("\n");
   const colors: string[] = [];
   for (const line of lines) {
-    if (line.startsWith("- ") && !isTaskLine(line)) {
-      colors.push(colorForLine(line, BULLET_PREFIX_COLORS));
+    if (!line.startsWith("- ") || isTaskLine(line)) continue;
+    const color = colorForLine(line, BULLET_PREFIX_COLORS);
+    if (color !== null) {
+      colors.push(color);
     }
   }
   return colors;

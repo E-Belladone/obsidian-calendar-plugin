@@ -12,7 +12,6 @@ import {
   stripFrontmatter,
 } from "./prefixColors";
 
-const NUM_MAX_DOTS = 6;
 const TASK_PREFIX_COLORS = buildPrefixTable("- [ ] ");
 
 export async function getTaskColors(note: TFile): Promise<string[]> {
@@ -24,8 +23,10 @@ export async function getTaskColors(note: TFile): Promise<string[]> {
   const lines = stripFrontmatter(fileContents).split("\n");
   const colors: string[] = [];
   for (const line of lines) {
-    if (isTaskLine(line)) {
-      colors.push(colorForLine(line, TASK_PREFIX_COLORS));
+    if (!isTaskLine(line)) continue;
+    const color = colorForLine(line, TASK_PREFIX_COLORS);
+    if (color !== null) {
+      colors.push(color);
     }
   }
   return colors;
@@ -38,15 +39,11 @@ export async function getDotsForDailyNote(
     return [];
   }
   const colors = await getTaskColors(dailyNote);
-  const seen = new Set<string>();
-  const dots: IDot[] = [];
-  for (const color of colors) {
-    if (dots.length >= NUM_MAX_DOTS) break;
-    if (seen.has(color)) continue;
-    seen.add(color);
-    dots.push({ className: "task", color, isFilled: false });
-  }
-  return dots;
+  return colors.map((color) => ({
+    className: "task",
+    color,
+    isFilled: false,
+  }));
 }
 
 export const tasksSource: ICalendarSource = {
