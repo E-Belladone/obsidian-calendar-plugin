@@ -1,0 +1,150 @@
+diff --git a/node_modules/obsidian-calendar-ui/dist/index.js b/node_modules/obsidian-calendar-ui/dist/index.js
+index 41b7e61..98d7bbe 100644
+--- a/node_modules/obsidian-calendar-ui/dist/index.js
++++ b/node_modules/obsidian-calendar-ui/dist/index.js
+@@ -588,7 +588,7 @@
+     function add_css$5() {
+     	var style = element("style");
+     	style.id = "svelte-1widvzq-style";
+-    	style.textContent = ".dot.svelte-1widvzq,.hollow.svelte-1widvzq{display:inline-block;height:6px;width:6px;margin:0 1px}.filled.svelte-1widvzq{fill:var(--color-dot)}.active.filled.svelte-1widvzq{fill:var(--text-on-accent)}.hollow.svelte-1widvzq{fill:none;stroke:var(--color-dot)}.active.hollow.svelte-1widvzq{fill:none;stroke:var(--text-on-accent)}";
++    	style.textContent = ".dot.svelte-1widvzq,.hollow.svelte-1widvzq{display:inline-block;height:10px;width:10px;margin:1px 1px}.filled.svelte-1widvzq{fill:var(--color-dot)}.active.filled.svelte-1widvzq{fill:var(--text-on-accent)}.hollow.svelte-1widvzq{fill:none;stroke:var(--color-dot)}.active.hollow.svelte-1widvzq{fill:none;stroke:var(--text-on-accent)}";
+     	append(document.head, style);
+     }
+ 
+@@ -602,11 +602,14 @@
+     		c() {
+     			svg = svg_element("svg");
+     			circle = svg_element("circle");
+-    			attr(circle, "cx", "3");
+-    			attr(circle, "cy", "3");
+-    			attr(circle, "r", "2");
++    			attr(circle, "cx", "5");
++    			attr(circle, "cy", "5");
++    			attr(circle, "stroke", /*color*/ ctx[3]);
++    			attr(circle, "fill", "none");
++    			attr(circle, "stroke-width", "2");
++    			attr(circle, "r", "4");
+     			attr(svg, "class", svg_class_value = "" + (null_to_empty(`hollow ${/*className*/ ctx[0]}`) + " svelte-1widvzq"));
+-    			attr(svg, "viewBox", "0 0 6 6");
++    			attr(svg, "viewBox", "0 0 10 10");
+     			attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+     			toggle_class(svg, "active", /*isActive*/ ctx[2]);
+     		},
+@@ -639,11 +642,12 @@
+     		c() {
+     			svg = svg_element("svg");
+     			circle = svg_element("circle");
+-    			attr(circle, "cx", "3");
+-    			attr(circle, "cy", "3");
+-    			attr(circle, "r", "2");
++    			attr(circle, "cx", "5");
++    			attr(circle, "cy", "5");
++    			attr(circle, "fill", /*color*/ ctx[3]);
++    			attr(circle, "r", "5");
+     			attr(svg, "class", svg_class_value = "" + (null_to_empty(`dot filled ${/*className*/ ctx[0]}`) + " svelte-1widvzq"));
+-    			attr(svg, "viewBox", "0 0 6 6");
++    			attr(svg, "viewBox", "0 0 10 10");
+     			attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+     			toggle_class(svg, "active", /*isActive*/ ctx[2]);
+     		},
+@@ -712,21 +716,23 @@
+     	let { className = "" } = $$props;
+     	let { isFilled } = $$props;
+     	let { isActive } = $$props;
++    	let { color = "" } = $$props;
+ 
+     	$$self.$$set = $$props => {
+     		if ("className" in $$props) $$invalidate(0, className = $$props.className);
+     		if ("isFilled" in $$props) $$invalidate(1, isFilled = $$props.isFilled);
+     		if ("isActive" in $$props) $$invalidate(2, isActive = $$props.isActive);
++    		if ("color" in $$props) $$invalidate(3, color = $$props.color);
+     	};
+ 
+-    	return [className, isFilled, isActive];
++    	return [className, isFilled, isActive, color];
+     }
+ 
+     class Dot extends SvelteComponent {
+     	constructor(options) {
+     		super();
+     		if (!document.getElementById("svelte-1widvzq-style")) add_css$5();
+-    		init(this, options, instance$6, create_fragment$6, safe_not_equal, { className: 0, isFilled: 1, isActive: 2 });
++    		init(this, options, instance$6, create_fragment$6, safe_not_equal, { className: 0, isFilled: 1, isActive: 2, color: 3 });
+     	}
+     }
+ 
+diff --git a/node_modules/obsidian-calendar-ui/dist/index.mjs b/node_modules/obsidian-calendar-ui/dist/index.mjs
+index d5260eb..0a4679f 100644
+--- a/node_modules/obsidian-calendar-ui/dist/index.mjs
++++ b/node_modules/obsidian-calendar-ui/dist/index.mjs
+@@ -584,7 +584,7 @@ var getDateUID_1 = getDateUID;
+ function add_css$5() {
+ 	var style = element("style");
+ 	style.id = "svelte-1widvzq-style";
+-	style.textContent = ".dot.svelte-1widvzq,.hollow.svelte-1widvzq{display:inline-block;height:6px;width:6px;margin:0 1px}.filled.svelte-1widvzq{fill:var(--color-dot)}.active.filled.svelte-1widvzq{fill:var(--text-on-accent)}.hollow.svelte-1widvzq{fill:none;stroke:var(--color-dot)}.active.hollow.svelte-1widvzq{fill:none;stroke:var(--text-on-accent)}";
++	style.textContent = ".dot.svelte-1widvzq,.hollow.svelte-1widvzq{display:inline-block;height:10px;width:10px;margin:1px 1px}.filled.svelte-1widvzq{fill:var(--color-dot)}.active.filled.svelte-1widvzq{fill:var(--text-on-accent)}.hollow.svelte-1widvzq{fill:none;stroke:var(--color-dot)}.active.hollow.svelte-1widvzq{fill:none;stroke:var(--text-on-accent)}";
+ 	append(document.head, style);
+ }
+ 
+@@ -598,11 +598,14 @@ function create_else_block$1(ctx) {
+ 		c() {
+ 			svg = svg_element("svg");
+ 			circle = svg_element("circle");
+-			attr(circle, "cx", "3");
+-			attr(circle, "cy", "3");
+-			attr(circle, "r", "2");
++			attr(circle, "cx", "5");
++			attr(circle, "cy", "5");
++			attr(circle, "stroke", /*color*/ ctx[3]);
++			attr(circle, "fill", "none");
++			attr(circle, "stroke-width", "2");
++			attr(circle, "r", "4");
+ 			attr(svg, "class", svg_class_value = "" + (null_to_empty(`hollow ${/*className*/ ctx[0]}`) + " svelte-1widvzq"));
+-			attr(svg, "viewBox", "0 0 6 6");
++			attr(svg, "viewBox", "0 0 10 10");
+ 			attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+ 			toggle_class(svg, "active", /*isActive*/ ctx[2]);
+ 		},
+@@ -635,11 +638,12 @@ function create_if_block$2(ctx) {
+ 		c() {
+ 			svg = svg_element("svg");
+ 			circle = svg_element("circle");
+-			attr(circle, "cx", "3");
+-			attr(circle, "cy", "3");
+-			attr(circle, "r", "2");
++			attr(circle, "cx", "5");
++			attr(circle, "cy", "5");
++			attr(circle, "fill", /*color*/ ctx[3]);
++			attr(circle, "r", "5");
+ 			attr(svg, "class", svg_class_value = "" + (null_to_empty(`dot filled ${/*className*/ ctx[0]}`) + " svelte-1widvzq"));
+-			attr(svg, "viewBox", "0 0 6 6");
++			attr(svg, "viewBox", "0 0 10 10");
+ 			attr(svg, "xmlns", "http://www.w3.org/2000/svg");
+ 			toggle_class(svg, "active", /*isActive*/ ctx[2]);
+ 		},
+@@ -708,21 +712,23 @@ function instance$6($$self, $$props, $$invalidate) {
+ 	let { className = "" } = $$props;
+ 	let { isFilled } = $$props;
+ 	let { isActive } = $$props;
++	let { color = "" } = $$props;
+ 
+ 	$$self.$$set = $$props => {
+ 		if ("className" in $$props) $$invalidate(0, className = $$props.className);
+ 		if ("isFilled" in $$props) $$invalidate(1, isFilled = $$props.isFilled);
+ 		if ("isActive" in $$props) $$invalidate(2, isActive = $$props.isActive);
++		if ("color" in $$props) $$invalidate(3, color = $$props.color);
+ 	};
+ 
+-	return [className, isFilled, isActive];
++	return [className, isFilled, isActive, color];
+ }
+ 
+ class Dot extends SvelteComponent {
+ 	constructor(options) {
+ 		super();
+ 		if (!document.getElementById("svelte-1widvzq-style")) add_css$5();
+-		init(this, options, instance$6, create_fragment$6, safe_not_equal, { className: 0, isFilled: 1, isActive: 2 });
++		init(this, options, instance$6, create_fragment$6, safe_not_equal, { className: 0, isFilled: 1, isActive: 2, color: 3 });
+ 	}
+ }
+ 
